@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { background: #000000; margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; font-family: 'Segoe UI', sans-serif; user-select: none; cursor: pointer; transition: background 0.5s ease; }
+  body.void-bg { background: radial-gradient(circle at center, #17123b 0%, #050510 70%, #000000 100%); }
+  body.shrine-bg { background: radial-gradient(circle at center, #380505 0%, #0d0101 70%, #000000 100%); }
+
+  .visor { position: relative; width: 92vw; max-width: 560px; height: 340px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+  /* ANIME HAIR SILHOUETTE ABOVE EYES */
+  .hair { position: relative; width: 360px; height: 75px; margin-bottom: -14px; display: flex; justify-content: center; align-items: flex-end; z-index: 2; pointer-events: none; transition: all 0.35s ease; }
+  .spike { width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-bottom: 65px solid #00f0ff; margin: 0 -10px; filter: drop-shadow(0 0 12px #00f0ff88); transition: all 0.35s ease; transform-origin: bottom center; }
+  .spike:nth-child(1) { transform: rotate(-38deg) scaleY(0.75); }
+  .spike:nth-child(2) { transform: rotate(-18deg) scaleY(0.95); }
+  .spike:nth-child(3) { transform: rotate(0deg) scaleY(1.1); }
+  .spike:nth-child(4) { transform: rotate(18deg) scaleY(0.95); }
+  .spike:nth-child(5) { transform: rotate(38deg) scaleY(0.75); }
+
+  /* Hide hair in default Cute Emo Buddy mode, show in Anime modes */
+  .mode-default .hair { opacity: 0; transform: translateY(15px) scale(0.8); }
+
+  /* EMO DIGITAL EYES */
+  .eyes { display: flex; gap: 11vw; z-index: 1; }
+  .eye { width: 155px; height: 155px; background: #00f0ff; border-radius: 30%; position: relative; overflow: hidden; box-shadow: 0 0 40px #00f0ff99, inset 0 0 20px rgba(255,255,255,0.4); transition: all 0.22s ease; display: flex; align-items: center; justify-content: center; }
+  .eye-inner { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease-out; }
+  .eye-glint { width: 28px; height: 28px; background: rgba(255,255,255,0.85); border-radius: 50%; position: absolute; top: 22px; left: 24px; transition: all 0.2s ease; }
+
+  .blink { transform: scaleY(0.06) !important; }
+  .talking .eye { animation: talkPulse 0.16s infinite alternate; }
+  .thinking .eye { border-radius: 50%; animation: thinkSpin 0.7s infinite alternate; }
+  .happy .eye { border-radius: 50% 50% 18% 18%; }
+
+  /* 1. DBZ SUPER SAIYAN */
+  .anime-ssj .spike { border-bottom-color: #ffd700; filter: drop-shadow(0 0 18px #ffd700); }
+  .anime-ssj .spike:nth-child(3) { transform: rotate(0deg) scaleY(1.35); }
+  .anime-ssj .eye { background: radial-gradient(circle, #55efc4 20%, #00b894 85%); border-radius: 26% 26% 36% 36%; box-shadow: 0 0 45px #ffd700cc, 0 0 25px #00ffcc; }
+  .anime-ssj .eye-inner::after { content: ''; width: 42px; height: 48px; background: #00332a; border-radius: 50%; }
+
+  /* 2. DBZ ULTRA INSTINCT */
+  .anime-ui .spike { border-bottom-color: #f8fafc; filter: drop-shadow(0 0 20px #ffffff) drop-shadow(0 0 10px #38bdf8); }
+  .anime-ui .eye { background: radial-gradient(circle, #ffffff 25%, #cbd5e1 75%, #94a3b8 100%); box-shadow: 0 0 50px #ffffff, 0 0 25px #7dd3fc; }
+  .anime-ui .eye-inner::after { content: ''; width: 46px; height: 46px; background: #0f172a; border-radius: 50%; }
+
+  /* 3. NARUTO SHARINGAN */
+  .anime-naruto .spike { border-bottom-color: #f97316; filter: drop-shadow(0 0 15px #ea580c); }
+  .anime-naruto .spike:nth-child(2), .anime-naruto .spike:nth-child(4) { border-bottom-color: #18181b; filter: drop-shadow(0 0 12px #ef4444); }
+  .anime-naruto .eye { background: radial-gradient(circle, #ff1e1e 45%, #991b1b 85%, #450a0a 100%); box-shadow: 0 0 45px #ef4444cc; border-radius: 34%; }
+  .anime-naruto .eye-inner::before { content: ''; position: absolute; width: 92px; height: 92px; border: 4px solid rgba(0,0,0,0.8); border-radius: 50%; }
+  .anime-naruto .eye-inner::after { content: ''; width: 32px; height: 32px; background: #000; border-radius: 50%; box-shadow: 0 -44px 0 -6px #000, 38px 24px 0 -6px #000, -38px 24px 0 -6px #000; animation: spinEye 3.5s linear infinite; }
+  .anime-naruto .eye-glint { opacity: 0.35; }
+
+  /* 4. MHA ALL MIGHT */
+  .anime-allmight .spike { border-bottom-color: #facc15; filter: drop-shadow(0 0 16px #eab308); }
+  .anime-allmight .spike:nth-child(1), .anime-allmight .spike:nth-child(5) { opacity: 0; }
+  .anime-allmight .spike:nth-child(3) { opacity: 0; }
+  .anime-allmight .spike:nth-child(2) { transform: rotate(-22deg) scaleY(1.45) translateX(-12px); }
+  .anime-allmight .spike:nth-child(4) { transform: rotate(22deg) scaleY(1.45) translateX(12px); }
+  .anime-allmight .eye { background: #090d16; border: 4px solid #38bdf8; box-shadow: 0 0 38px #38bdf8aa; }
+  .anime-allmight .eye-inner::after { content: ''; width: 52px; height: 52px; background: radial-gradient(circle, #ffffff 15%, #38bdf8 60%, #0284c7 100%); border-radius: 50%; box-shadow: 0 0 28px #38bdf8, 0 0 14px #ffffff; }
+  .anime-allmight .eye-glint { display: none; }
+
+  /* 5. JJK GOJO SIX EYES */
+  .anime-jjk .spike { border-bottom-color: #ffffff; filter: drop-shadow(0 0 18px #7dd3fc) drop-shadow(0 0 10px #ffffff); }
+  .anime-jjk .spike:nth-child(3) { transform: rotate(4deg) scaleY(1.3); }
+  .anime-jjk .eye { background: radial-gradient(circle, #ffffff 12%, #7dd3fc 42%, #0284c7 75%, #312e81 100%); box-shadow: 0 0 50px #38bdf8, 0 0 25px #a855f7; border-radius: 32%; }
+  .anime-jjk .eye-inner::before { content: ''; position: absolute; width: 105px; height: 105px; border: 3px dashed rgba(255,255,255,0.9); border-radius: 50%; animation: spinEye 7s linear infinite; }
+  .anime-jjk .eye-inner::after { content: ''; width: 38px; height: 38px; background: #090d16; border-radius: 50%; box-shadow: 0 0 16px #38bdf8; }
+
+  /* 6. JJK SUKUNA MALEVOLENT SHRINE */
+  .anime-sukuna .spike { border-bottom-color: #f472b6; filter: drop-shadow(0 0 15px #ef4444); }
+  .anime-sukuna .spike:nth-child(1), .anime-sukuna .spike:nth-child(5) { border-bottom-color: #18181b; }
+  .anime-sukuna .eye { background: radial-gradient(circle, #fca5a5 10%, #ef4444 50%, #7f1d1d 90%); border-radius: 24% 24% 38% 38%; box-shadow: 0 0 45px #dc2626; overflow: visible; }
+  .anime-sukuna .eye::after { content: ''; position: absolute; bottom: -22px; width: 90px; height: 12px; background: #ef4444; border-radius: 4px; box-shadow: 0 0 14px #dc2626; }
+  .anime-sukuna .eye-inner::after { content: ''; width: 24px; height: 58px; background: #000000; border-radius: 50%; }
+
+  #badge { position: fixed; top: 16px; color: #64748b; font-size: 13px; letter-spacing: 0.5px; }
+  #status { position: fixed; bottom: 18px; color: #64748b; font-size: 14px; text-align: center; padding: 0 20px; }
+
+  @keyframes talkPulse { from { transform: scaleY(0.84) scaleX(1.04); } to { transform: scaleY(1.1) scaleX(0.96); } }
+  @keyframes thinkSpin { from { transform: scale(0.9); opacity: 0.6; } to { transform: scale(1.06); opacity: 1; } }
+  @keyframes spinEye { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+</head>
+<body onclick="startBuddy()">
+  <div id="badge">EMO Buddy</div>
+  <div class="visor mode-default" id="visor">
+    <div class="hair">
+      <div class="spike"></div>
+      <div class="spike"></div>
+      <div class="spike"></div>
+      <div class="spike"></div>
+      <div class="spike"></div>
+    </div>
+    <div class="eyes">
+      <div class="eye" id="e1"><div class="eye-inner" id="p1"><div class="eye-glint"></div></div></div>
+      <div class="eye" id="e2"><div class="eye-inner" id="p2"><div class="eye-glint"></div></div></div>
+    </div>
+  </div>
+  <div id="status">Tap screen once to wake me up!</div>
+
+<script>
+  const visor = document.getElementById('visor');
+  const badge = document.getElementById('badge');
+  const eyes = [document.getElementById('e1'), document.getElementById('e2')];
+  const inners = [document.getElementById('p1'), document.getElementById('p2')];
+  const status = document.getElementById('status');
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec, isSpeaking = false, started = false, styleIdx = 0;
+
+  const styles = [
+    { cls: 'mode-default', name: 'EMO Buddy' },
+    { cls: 'anime-ssj', name: 'DBZ: Super Saiyan' },
+    { cls: 'anime-ui', name: 'DBZ: Ultra Instinct' },
+    { cls: 'anime-naruto', name: 'Naruto: Sharingan' },
+    { cls: 'anime-allmight', name: 'MHA: All Might' },
+    { cls: 'anime-jjk', name: 'JJK: Six Eyes (Ryoiki Tenkai)' },
+    { cls: 'anime-sukuna', name: 'JJK: Malevolent Shrine (Sukuna)' }
+  ];
+
+  function applyStyle(idx) {
+    styleIdx = idx % styles.length;
+    visor.classList.remove('mode-default', 'anime-ssj', 'anime-ui', 'anime-naruto', 'anime-allmight', 'anime-jjk', 'anime-sukuna');
+    document.body.classList.remove('void-bg', 'shrine-bg');
+    if (styles[styleIdx].cls) visor.classList.add(styles[styleIdx].cls);
+    if (styleIdx === 5) document.body.classList.add('void-bg');
+    if (styleIdx === 6) document.body.classList.add('shrine-bg');
+    badge.textContent = styles[styleIdx].name;
+  }
+
+  setInterval(() => {
+    eyes.forEach(e => e.classList.add('blink'));
+    setTimeout(() => eyes.forEach(e => e.classList.remove('blink')), 130);
+  }, 3200);
+
+  setInterval(() => {
+    if (!isSpeaking) {
+      const x = (Math.random() - 0.5) * 18;
+      const y = (Math.random() - 0.5) * 14;
+      inners.forEach(p => p.style.transform = `translate(${x}px, ${y}px)`);
+    }
+  }, 2200);
+
+  function setMood(mood) {
+    visor.classList.remove('happy', 'thinking', 'talking');
+    if (mood) visor.classList.add(mood);
+  }
+
+  function speak(text, mood = 'happy') {
+    speechSynthesis.cancel();
+    isSpeaking = true;
+    status.textContent = text;
