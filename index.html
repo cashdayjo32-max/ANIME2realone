@@ -3,7 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body { background: #000000; margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; font-family: 'Segoe UI', sans-serif; user-select: none; cursor: pointer; transition: background 0.5s ease; }
+  html, body { background: #000000; margin: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; font-family: 'Segoe UI', sans-serif; user-select: none; cursor: pointer; transition: background 0.5s ease; }
   body.void-bg { background: radial-gradient(circle at center, #17123b 0%, #050510 70%, #000000 100%); }
   body.shrine-bg { background: radial-gradient(circle at center, #380505 0%, #0d0101 70%, #000000 100%); }
 
@@ -18,7 +18,6 @@
   .spike:nth-child(4) { transform: rotate(18deg) scaleY(0.95); }
   .spike:nth-child(5) { transform: rotate(38deg) scaleY(0.75); }
 
-  /* Hide hair in default Cute Emo Buddy mode, show in Anime modes */
   .mode-default .hair { opacity: 0; transform: translateY(15px) scale(0.8); }
 
   /* EMO DIGITAL EYES */
@@ -76,6 +75,7 @@
   .anime-sukuna .eye-inner::after { content: ''; width: 24px; height: 58px; background: #000000; border-radius: 50%; }
 
   #badge { position: fixed; top: 16px; color: #64748b; font-size: 13px; letter-spacing: 0.5px; }
+  #wakeBtn { position: fixed; bottom: 52px; background: #00f0ff; color: #000; border: none; padding: 12px 26px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 0 20px #00f0ff88; z-index: 10; }
   #status { position: fixed; bottom: 18px; color: #64748b; font-size: 14px; text-align: center; padding: 0 20px; }
 
   @keyframes talkPulse { from { transform: scaleY(0.84) scaleX(1.04); } to { transform: scaleY(1.1) scaleX(0.96); } }
@@ -83,7 +83,7 @@
   @keyframes spinEye { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>
 </head>
-<body onclick="startBuddy()">
+<body>
   <div id="badge">EMO Buddy</div>
   <div class="visor mode-default" id="visor">
     <div class="hair">
@@ -98,11 +98,13 @@
       <div class="eye" id="e2"><div class="eye-inner" id="p2"><div class="eye-glint"></div></div></div>
     </div>
   </div>
-  <div id="status">Tap screen once to wake me up!</div>
+  <button id="wakeBtn" onclick="startBuddy()">Wake Up Buddy</button>
+  <div id="status">Tap Wake Up Buddy to start!</div>
 
 <script>
   const visor = document.getElementById('visor');
   const badge = document.getElementById('badge');
+  const wakeBtn = document.getElementById('wakeBtn');
   const eyes = [document.getElementById('e1'), document.getElementById('e2')];
   const inners = [document.getElementById('p1'), document.getElementById('p2')];
   const status = document.getElementById('status');
@@ -142,12 +144,3 @@
     }
   }, 2200);
 
-  function setMood(mood) {
-    visor.classList.remove('happy', 'thinking', 'talking');
-    if (mood) visor.classList.add(mood);
-  }
-
-  function speak(text, mood = 'happy') {
-    speechSynthesis.cancel();
-    isSpeaking = true;
-    status.textContent = text;
